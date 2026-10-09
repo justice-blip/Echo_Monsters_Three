@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Echo Monsters">
+
+<title>Echo Monsters</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: manipulation;
+}
+
+body {
+    background: #f6e8c9;
+    font-family: system-ui, sans-serif;
+}
+
+#stage {
+    width: 100%;
+    height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 3vw, 35px);
+    padding:
+        env(safe-area-inset-top)
+        12px
+        env(safe-area-inset-bottom);
+}
+
+/* MONSTERS */
+
+.monster {
+    --monster-color: #78b7ff;
+
+    width: min(29vw, 220px);
+    aspect-ratio: 0.72;
+    border: 0;
+    padding: 0;
+
+    background: var(--monster-color);
+
+    border-radius: 46% 46% 35% 35% / 35% 35% 25% 25%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    position: relative;
+
+    box-shadow:
+        inset 0 -10px 0 rgba(0,0,0,0.06),
+        0 10px 20px rgba(0,0,0,0.12);
+
+    transition:
+        transform 0.18s ease,
+        opacity 0.18s ease;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+.monster.deep {
+    --monster-color: #8d76d6;
+}
+
+.monster.normal {
+    --monster-color: #4fd5a3;
+}
+
+.monster.high {
+    --monster-color: #f39bb4;
+}
+
+
+/* LITTLE HORNS */
+
+.monster::before,
+.monster::after {
+    content: "";
+    position: absolute;
+    top: -13px;
+
+    width: 34px;
+    height: 42px;
+
+    background: var(--monster-color);
+
+    border-radius: 80% 10% 60% 30%;
+}
+
+.monster::before {
+    left: 23%;
+    transform: rotate(-25deg);
+}
+
+.monster::after {
+    right: 23%;
+    transform: scaleX(-1) rotate(-25deg);
+}
+
+
+/* EYES */
+
+.eyes {
+    display: flex;
+    gap: clamp(9px, 2vw, 24px);
+}
+
+.eye {
+    width: clamp(43px, 8vw, 75px);
+    height: clamp(38px, 7vw, 65px);
+
+    background: white;
+    border-radius: 50%;
+
+    position: relative;
+}
+
+.pupil {
+    position: absolute;
+
+    width: 55%;
+    aspect-ratio: 1;
+
+    background: #202020;
+    border-radius: 50%;
+
+    left: 50%;
+    top: 46%;
+
+    transform: translate(-50%, -50%);
+}
+
+
+/* FACE */
+
+.lower-face {
+    display: flex;
+    align-items: center;
+    gap: clamp(5px, 1vw, 12px);
+}
+
+.cheek {
+    width: clamp(22px, 4vw, 40px);
+    aspect-ratio: 1;
+
+    background: rgba(255, 75, 110, 0.55);
+    border-radius: 50%;
+}
+
+.mouth {
+    width: clamp(38px, 6vw, 60px);
+    height: 45px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* IDLE SMILE */
+
+.smile {
+    width: 70%;
+    height: 20px;
+
+    border-bottom: 6px solid #202020;
+    border-radius: 0 0 50px 50px;
+}
+
+
+/* LISTENING */
+
+.monster.listening {
+    transform: scale(1.08);
+}
+
+.monster.listening .eye {
+    transform: scale(1.08);
+}
+
+.monster.listening .pupil {
+    transform: translate(-50%, -50%) scale(0.85);
+}
+
+.o-mouth {
+    width: 31px;
+    height: 38px;
+
+    background: #202020;
+    border-radius: 50%;
+}
+
+
+/* TALKING */
+
+.monster.talking {
+    transform: scale(1.08);
+}
+
+.talk-mouth {
+    width: 48px;
+    height: 28px;
+
+    background: #202020;
+    border-radius: 50%;
+
+    position: relative;
+    overflow: hidden;
+
+    animation: chatter 0.18s infinite alternate ease-in-out;
+}
+
+.talk-mouth::after {
+    content: "";
+
+    position: absolute;
+
+    width: 28px;
+    height: 13px;
+
+    background: #ff5875;
+
+    border-radius: 50%;
+
+    left: 10px;
+    bottom: -2px;
+}
+
+@keyframes chatter {
+    from {
+        transform: scaleY(0.65);
+    }
+
+    to {
+        transform: scaleY(1.25);
+    }
+}
+
+
+/* inactive monsters fade slightly */
+
+body.busy .monster:not(.active) {
+    opacity: 0.55;
+    transform: scale(0.94);
+}
+
+
+/* small phones */
+
+@media (max-width: 600px) {
+
+    #stage {
+        gap: 7px;
+        padding-left: 7px;
+        padding-right: 7px;
+    }
+
+    .monster {
+        width: 31vw;
+        gap: 12px;
+        border-radius: 44% 44% 32% 32%;
+    }
+
+    .monster::before,
+    .monster::after {
+        width: 24px;
+        height: 31px;
+        top: -9px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="stage">
+
+    <!-- DEEP -->
+
+    <button class="monster deep" data-rate="0.78">
+
+        <div class="eyes">
+            <div class="eye"><div class="pupil"></div></div>
+            <div class="eye"><div class="pupil"></div></div>
+        </div>
+
+        <div class="lower-face">
+
+            <div class="cheek"></div>
+
+            <div class="mouth">
+                <div class="smile"></div>
+            </div>
+
+            <div class="cheek"></div>
+
+        </div>
+
+    </button>
+
+
+    <!-- NORMAL -->
+
+    <button class="monster normal" data-rate="1">
+
+        <div class="eyes">
+            <div class="eye"><div class="pupil"></div></div>
+            <div class="eye"><div class="pupil"></div></div>
+        </div>
+
+        <div class="lower-face">
+
+            <div class="cheek"></div>
+
+            <div class="mouth">
+                <div class="smile"></div>
+            </div>
+
+            <div class="cheek"></div>
+
+        </div>
+
+    </button>
+
+
+    <!-- HIGH -->
+
+    <button class="monster high" data-rate="1.25">
+
+        <div class="eyes">
+            <div class="eye"><div class="pupil"></div></div>
+            <div class="eye"><div class="pupil"></div></div>
+        </div>
+
+        <div class="lower-face">
+
+            <div class="cheek"></div>
+
+            <div class="mouth">
+                <div class="smile"></div>
+            </div>
+
+            <div class="cheek"></div>
+
+        </div>
+
+    </button>
+
+</div>
+
+
+<script>
+
+const monsters = document.querySelectorAll(".monster");
+
+let stream = null;
+let recorder = null;
+let audioContext = null;
+let analyser = null;
+
+let chunks = [];
+
+let activeMonster = null;
+let playbackRate = 1;
+
+let busy = false;
+
+let speechDetected = false;
+let silenceStarted = null;
+
+let animationFrame = null;
+let maxTimer = null;
+
+
+/*
+    SILENCE DETECTION
+
+    SILENCE_MS:
+    how long quiet must last after talking.
+
+    SPEECH_THRESHOLD:
+    how loud something needs to be before
+    we consider it speech.
+*/
+
+const SILENCE_MS = 800;
+const SPEECH_THRESHOLD = 0.035;
+const MAX_RECORDING_MS = 8000;
+
+
+/* -------------------------
+   FACE
+------------------------- */
+
+function setIdle(monster) {
+
+    monster.classList.remove(
+        "listening",
+        "talking",
+        "active"
+    );
+
+    monster.querySelector(".mouth").innerHTML =
+        '<div class="smile"></div>';
+}
+
+
+function setListening(monster) {
+
+    monster.classList.add(
+        "active",
+        "listening"
+    );
+
+    monster.classList.remove("talking");
+
+    monster.querySelector(".mouth").innerHTML =
+        '<div class="o-mouth"></div>';
+}
+
+
+function setTalking(monster) {
+
+    monster.classList.remove("listening");
+
+    monster.classList.add(
+        "active",
+        "talking"
+    );
+
+    monster.querySelector(".mouth").innerHTML =
+        '<div class="talk-mouth"></div>';
+}
+
+
+/* -------------------------
+   START
+------------------------- */
+
+async function startMonster(monster) {
+
+    if (busy)
+        return;
+
+    busy = true;
+
+    document.body.classList.add("busy");
+
+    activeMonster = monster;
+
+    playbackRate =
+        Number(monster.dataset.rate);
+
+    speechDetected = false;
+    silenceStarted = null;
+
+    setListening(monster);
+
+    try {
+
+        /*
+          Create/resume AudioContext while
+          we're still inside the user's tap.
+          Important for iPhone Safari.
+        */
+
+        if (!audioContext) {
+
+            audioContext =
+                new (
+                    window.AudioContext ||
+                    window.webkitAudioContext
+                )();
+        }
+
+        await audioContext.resume();
+
+
+        /* microphone */
+
+        stream =
+            await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            });
+
+
+        /* analyser for silence detection */
+
+        const source =
+            audioContext.createMediaStreamSource(stream);
+
+        analyser =
+            audioContext.createAnalyser();
+
+        analyser.fftSize = 1024;
+
+        source.connect(analyser);
+
+
+        /* recorder */
+
+        chunks = [];
+
+        recorder =
+            new MediaRecorder(stream);
+
+        recorder.ondataavailable = event => {
+
+            if (event.data.size > 0) {
+                chunks.push(event.data);
+            }
+        };
+
+
+        recorder.onstop = async () => {
+
+            cancelAnimationFrame(animationFrame);
+
+            clearTimeout(maxTimer);
+
+            const blob =
+                new Blob(
+                    chunks,
+                    { type: recorder.mimeType }
+                );
+
+            stopMicrophone();
+
+            /*
+              If no actual speech happened,
+              don't play an empty recording.
+            */
+
+            if (!speechDetected) {
+
+                finishCycle();
+                return;
+            }
+
+            try {
+
+                const arrayBuffer =
+                    await blob.arrayBuffer();
+
+                await playRecording(arrayBuffer);
+
+            } catch (error) {
+
+                console.error(error);
+
+                finishCycle();
+            }
+        };
+
+
+        recorder.start();
+
+        monitorVolume();
+
+
+        /* absolute safety limit */
+
+        maxTimer =
+            setTimeout(() => {
+
+                stopRecording();
+
+            }, MAX_RECORDING_MS);
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        stopMicrophone();
+
+        finishCycle();
+
+        alert(
+            "Echo Monsters needs microphone permission."
+        );
+    }
+}
+
+
+/* -------------------------
+   LISTEN FOR SPEECH/SILENCE
+------------------------- */
+
+function monitorVolume() {
+
+    if (
+        !analyser ||
+        !recorder ||
+        recorder.state !== "recording"
+    ) {
+        return;
+    }
+
+    const data =
+        new Uint8Array(analyser.fftSize);
+
+    analyser.getByteTimeDomainData(data);
+
+
+    /*
+       Calculate RMS volume.
+    */
+
+    let sum = 0;
+
+    for (let i = 0; i < data.length; i++) {
+
+        const value =
+            (data[i] - 128) / 128;
+
+        sum += value * value;
+    }
+
+    const rms =
+        Math.sqrt(sum / data.length);
+
+
+    /*
+       We heard something.
+    */
+
+    if (rms > SPEECH_THRESHOLD) {
+
+        speechDetected = true;
+
+        silenceStarted = null;
+    }
+
+
+    /*
+       We've already heard speech and
+       it's now quiet.
+    */
+
+    else if (speechDetected) {
+
+        if (silenceStarted === null) {
+
+            silenceStarted =
+                performance.now();
+        }
+
+        else if (
+            performance.now() - silenceStarted
+            >= SILENCE_MS
+        ) {
+
+            stopRecording();
+
+            return;
+        }
+    }
+
+
+    animationFrame =
+        requestAnimationFrame(monitorVolume);
+}
+
+
+/* -------------------------
+   STOP RECORDING
+------------------------- */
+
+function stopRecording() {
+
+    if (
+        recorder &&
+        recorder.state === "recording"
+    ) {
+
+        recorder.stop();
+    }
+}
+
+
+/* -------------------------
+   PLAY
+------------------------- */
+
+async function playRecording(arrayBuffer) {
+
+    const buffer =
+        await audioContext.decodeAudioData(
+            arrayBuffer
+        );
+
+    const source =
+        audioContext.createBufferSource();
+
+    source.buffer = buffer;
+
+    source.playbackRate.value =
+        playbackRate;
+
+    source.connect(
+        audioContext.destination
+    );
+
+    setTalking(activeMonster);
+
+    source.onended = () => {
+
+        finishCycle();
+    };
+
+    source.start();
+}
+
+
+/* -------------------------
+   CLEANUP
+------------------------- */
+
+function stopMicrophone() {
+
+    if (stream) {
+
+        stream
+            .getTracks()
+            .forEach(track => track.stop());
+
+        stream = null;
+    }
+}
+
+
+function finishCycle() {
+
+    cancelAnimationFrame(animationFrame);
+
+    clearTimeout(maxTimer);
+
+    stopMicrophone();
+
+    if (activeMonster) {
+        setIdle(activeMonster);
+    }
+
+    activeMonster = null;
+
+    document.body.classList.remove("busy");
+
+    busy = false;
+}
+
+
+/* -------------------------
+   MONSTER TAPS
+------------------------- */
+
+monsters.forEach(monster => {
+
+    monster.addEventListener(
+        "pointerdown",
+        event => {
+
+            event.preventDefault();
+
+            startMonster(monster);
+        }
+    );
+});
+
+</script>
+
+</body>
+</html>
+
